@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
-import logoPontua from '@/assets/logo-pontua-branca.svg';
+import logoPontua from '@/assets/logo-pontua-azul.svg';
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: 'Email inválido' }),
