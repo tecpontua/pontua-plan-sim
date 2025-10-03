@@ -138,6 +138,27 @@ export default function Simulador() {
     // Erro de validação
   }
 
+  // Calcular preços base para cada plano com colaboradores selecionados
+  const calcularPrecoPlano = (tipoplano: PlanType, qtdColaboradores: number) => {
+    try {
+      const sim = calcularSimulacao({
+        plano: tipoplano,
+        colaboradores: qtdColaboradores,
+        empresasAdicionaisPacotes: 0,
+        apiAberta: false,
+        reconhecimentoFacialQtd: 0,
+        treinamento: null,
+      });
+      return sim.precoBase;
+    } catch {
+      return null;
+    }
+  };
+
+  const precoEmpreendedor = calcularPrecoPlano('Plano Empreendedor', Math.min(colaboradores, 12));
+  const precoProfissional = calcularPrecoPlano('Plano profissional', colaboradores);
+  const precoCorporativo = calcularPrecoPlano('Plano corporativo', colaboradores);
+
   const formatMoney = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
@@ -246,7 +267,9 @@ export default function Simulador() {
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Empreendedor</CardTitle>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">R$ 59,00</span>
+                    <span className="text-4xl font-bold">
+                      {precoEmpreendedor ? formatMoney(precoEmpreendedor) : 'R$ 59,00'}
+                    </span>
                   </div>
                   <CardDescription className="text-sm">
                     Para negócios de até 12 colaboradores que estão iniciando o controle de jornada.
@@ -345,7 +368,9 @@ export default function Simulador() {
                 <CardHeader className="text-center pb-4 pt-8">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Profissional</CardTitle>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">R$ 109,00</span>
+                    <span className="text-4xl font-bold">
+                      {precoProfissional ? formatMoney(precoProfissional) : 'R$ 109,00'}
+                    </span>
                   </div>
                   <CardDescription className="text-sm">
                     Indicado para negócios que queiram automatizar processos e rotinas e ser mais ágeis.
@@ -454,7 +479,9 @@ export default function Simulador() {
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Corporativo</CardTitle>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">R$ 144,00</span>
+                    <span className="text-4xl font-bold">
+                      {precoCorporativo ? formatMoney(precoCorporativo) : 'R$ 144,00'}
+                    </span>
                   </div>
                   <CardDescription className="text-sm">
                     Indicado para empresas que buscam ainda mais controle, segurança e produtividade no controle de jornada.
