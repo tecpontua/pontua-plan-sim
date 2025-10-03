@@ -138,16 +138,83 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          team_id: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id: string
+          team_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_buttons: {
+        Row: {
+          created_at: string
+          id: string
+          link: string
+          team_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link: string
+          team_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string
+          team_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_buttons_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
         }
         Relationships: []
       }
