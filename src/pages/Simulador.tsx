@@ -160,15 +160,22 @@ export default function Simulador() {
               <div className="space-y-2">
                 <Label>Colaboradores</Label>
                 <Select
-                  value={colaboradoresTipo}
-                  onValueChange={(v) => setColaboradoresTipo(v as 'fixo' | 'personalizado')}
+                  value={colaboradoresTipo === 'fixo' ? String(colaboradoresFixo) : 'personalizado'}
+                  onValueChange={(v) => {
+                    if (v === 'personalizado') {
+                      setColaboradoresTipo('personalizado');
+                    } else {
+                      setColaboradoresTipo('fixo');
+                      setColaboradoresFixo(Number(v));
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {tiers.map((tier) => (
-                      <SelectItem key={tier} value="fixo" onClick={() => setColaboradoresFixo(tier)}>
+                      <SelectItem key={tier} value={String(tier)}>
                         {tier} colaboradores
                       </SelectItem>
                     ))}
