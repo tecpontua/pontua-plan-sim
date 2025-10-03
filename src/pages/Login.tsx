@@ -73,7 +73,6 @@ export default function Login() {
           <div className="flex justify-center mb-4">
             <img src={logoPontua} alt="Pontua" className="h-12" />
           </div>
-          <CardDescription>Simule planos em call com clientes</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
