@@ -9,8 +9,17 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Users, Calculator } from 'lucide-react';
+import { LogOut, Users, Calculator, UserPlus, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { NovoUsuarioModal } from '@/components/NovoUsuarioModal';
 import {
   PlanType,
   TreinamentoType,
@@ -33,6 +42,7 @@ export default function Simulador() {
   const [apiAberta, setApiAberta] = useState<boolean>(false);
   const [reconhecimentoFacialQtd, setReconhecimentoFacialQtd] = useState<number>(0);
   const [treinamento, setTreinamento] = useState<TreinamentoType | null>(null);
+  const [modalNovoUsuario, setModalNovoUsuario] = useState(false);
 
   const colaboradores = colaboradoresTipo === 'fixo' ? colaboradoresFixo : colaboradoresPersonalizado;
   const tiers = getAvailableTiers(plano);
@@ -120,10 +130,26 @@ export default function Simulador() {
           </div>
           <div className="flex items-center gap-4">
             {role === 'admin' && (
-              <Button variant="outline" onClick={() => navigate('/admin/usuarios')}>
-                <Users className="h-4 w-4 mr-2" />
-                Gerenciar Usuários
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Administração</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setModalNovoUsuario(true)}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Novo Usuário
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/usuarios')}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Gerenciar Usuários
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <div className="text-sm text-muted-foreground">{user?.email}</div>
             <Button variant="ghost" onClick={signOut}>
@@ -366,6 +392,18 @@ export default function Simulador() {
           </Card>
         )}
       </main>
+
+      {/* Modal de Novo Usuário */}
+      <NovoUsuarioModal 
+        open={modalNovoUsuario} 
+        onOpenChange={setModalNovoUsuario}
+        onSuccess={() => {
+          toast({
+            title: 'Sucesso!',
+            description: 'Usuário criado com sucesso.',
+          });
+        }}
+      />
     </div>
   );
 }
