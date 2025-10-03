@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Login from "./pages/Login";
 import Simulador from "./pages/Simulador";
 import AdminUsuarios from "./pages/AdminUsuarios";
+import AdminEquipes from "./pages/AdminEquipes";
 import Setup from "./pages/Setup";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminUsuarios />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/equipes"
+              element={
+                <ProtectedRoute>
+                  <AdminEquipes />
                 </ProtectedRoute>
               }
             />

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Users, Calculator, UserPlus, Settings } from 'lucide-react';
+import { LogOut, Users, Calculator, UserPlus, Settings, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -46,6 +47,33 @@ export default function Simulador() {
   const [reconhecimentoFacialQtd, setReconhecimentoFacialQtd] = useState<number>(0);
   const [treinamento, setTreinamento] = useState<TreinamentoType | null>(null);
   const [modalNovoUsuario, setModalNovoUsuario] = useState(false);
+  const [teamButton, setTeamButton] = useState<{ titulo: string; link: string } | null>(null);
+
+  useEffect(() => {
+    fetchTeamButton();
+  }, [user]);
+
+  const fetchTeamButton = async () => {
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('team_id')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.team_id) {
+      const { data: button } = await supabase
+        .from('team_buttons')
+        .select('titulo, link')
+        .eq('team_id', profile.team_id)
+        .single();
+
+      if (button) {
+        setTeamButton(button);
+      }
+    }
+  };
 
   const colaboradores = colaboradoresTipo === 'fixo' ? colaboradoresFixo : colaboradoresPersonalizado;
   const tiers = getAvailableTiers(plano);
@@ -150,6 +178,10 @@ export default function Simulador() {
                     <Users className="h-4 w-4 mr-2" />
                     Gerenciar Usuários
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/equipes')}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Gerenciar Equipes
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -163,8 +195,6 @@ export default function Simulador() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-primary mb-6">Planos Pontua</h1>
-
         <Tabs defaultValue="simulador" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="simulador">Simulador</TabsTrigger>
@@ -172,6 +202,18 @@ export default function Simulador() {
           </TabsList>
 
           <TabsContent value="simulador" className="space-y-6">
+            {teamButton && (
+              <div className="flex justify-end">
+                <Button
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => window.open(teamButton.link, '_blank')}
+                >
+                  {teamButton.titulo}
+                  <ExternalLink className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            )}
+
         <div className="grid md:grid-cols-3 gap-6">
           {/* Seleção Principal */}
           <Card>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,24 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
   const [novoEmail, setNovoEmail] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [novoPapel, setNovoPapel] = useState<'admin' | 'usuario'>('usuario');
+  const [novaEquipe, setNovaEquipe] = useState('');
+  const [teams, setTeams] = useState<any[]>([]);
   const [criando, setCriando] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetchTeams();
+    }
+  }, [open]);
+
+  const fetchTeams = async () => {
+    const { data } = await supabase
+      .from('teams')
+      .select('*')
+      .order('nome');
+    
+    if (data) setTeams(data);
+  };
 
   const criarUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +54,18 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
       if (signUpError) throw signUpError;
 
       if (data.user) {
+        // Atualizar profile com team_id
+        if (novaEquipe) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ team_id: novaEquipe })
+            .eq('id', data.user.id);
+
+          if (profileError) {
+            console.error('Erro ao atualizar profile:', profileError);
+          }
+        }
+
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({ user_id: data.user.id, role: novoPapel });
@@ -51,6 +80,7 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
         setNovoEmail('');
         setNovaSenha('');
         setNovoPapel('usuario');
+        setNovaEquipe('');
         onOpenChange(false);
         onSuccess?.();
       }
@@ -108,6 +138,21 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
                 <SelectContent>
                   <SelectItem value="usuario">Usuário Padrão</SelectItem>
                   <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="modal-equipe">Equipe</Label>
+              <Select value={novaEquipe} onValueChange={setNovaEquipe}>
+                <SelectTrigger id="modal-equipe">
+                  <SelectValue placeholder="Selecione uma equipe (opcional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.nome}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
