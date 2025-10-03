@@ -56,22 +56,40 @@ export default function Simulador() {
   const fetchTeamButton = async () => {
     if (!user) return;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('team_id')
-      .eq('id', user.id)
-      .single();
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('team_id')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    if (profile?.team_id) {
-      const { data: button } = await supabase
-        .from('team_buttons')
-        .select('titulo, link')
-        .eq('team_id', profile.team_id)
-        .single();
-
-      if (button) {
-        setTeamButton(button);
+      if (profileError) {
+        console.error('Erro ao buscar profile:', profileError);
+        return;
       }
+
+      if (profile?.team_id) {
+        const { data: button, error: buttonError } = await supabase
+          .from('team_buttons')
+          .select('titulo, link')
+          .eq('team_id', profile.team_id)
+          .maybeSingle();
+
+        if (buttonError) {
+          console.error('Erro ao buscar botão:', buttonError);
+          return;
+        }
+
+        if (button) {
+          setTeamButton(button);
+        } else {
+          setTeamButton(null);
+        }
+      } else {
+        setTeamButton(null);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar botão da equipe:', error);
     }
   };
 
@@ -203,13 +221,14 @@ export default function Simulador() {
 
           <TabsContent value="simulador" className="space-y-6">
             {teamButton && (
-              <div className="flex justify-end">
+              <div className="flex justify-end mb-4">
                 <Button
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  size="lg"
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   onClick={() => window.open(teamButton.link, '_blank')}
                 >
                   {teamButton.titulo}
-                  <ExternalLink className="h-4 w-4 ml-2" />
+                  <ExternalLink className="h-5 w-5 ml-2" />
                 </Button>
               </div>
             )}

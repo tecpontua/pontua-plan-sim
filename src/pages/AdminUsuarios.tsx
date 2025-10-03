@@ -16,6 +16,8 @@ type UserWithRole = {
   id: string;
   email: string;
   role: 'admin' | 'usuario' | null;
+  team_id: string | null;
+  team_nome: string | null;
   created_at: string;
 };
 
@@ -25,11 +27,14 @@ export default function AdminUsuarios() {
   const { toast } = useToast();
 
   const [users, setUsers] = useState<UserWithRole[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [novoEmail, setNovoEmail] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [novoPapel, setNovoPapel] = useState<'admin' | 'usuario'>('usuario');
   const [criando, setCriando] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string>('');
 
   useEffect(() => {
     if (!loading && role !== 'admin') {
@@ -40,14 +45,24 @@ export default function AdminUsuarios() {
   useEffect(() => {
     if (role === 'admin') {
       carregarUsuarios();
+      carregarEquipes();
     }
   }, [role]);
+
+  const carregarEquipes = async () => {
+    const { data } = await supabase
+      .from('teams')
+      .select('*')
+      .order('nome');
+    
+    if (data) setTeams(data);
+  };
 
   const carregarUsuarios = async () => {
     try {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, teams(nome)')
         .order('created_at', { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -58,12 +73,14 @@ export default function AdminUsuarios() {
 
       if (rolesError) throw rolesError;
 
-      const usersWithRoles = profiles.map((profile) => {
+      const usersWithRoles = profiles.map((profile: any) => {
         const userRole = roles.find((r) => r.user_id === profile.id);
         return {
           id: profile.id,
           email: profile.email,
           role: userRole?.role || null,
+          team_id: profile.team_id,
+          team_nome: profile.teams?.nome || null,
           created_at: profile.created_at,
         };
       });
@@ -152,6 +169,32 @@ export default function AdminUsuarios() {
     }
   };
 
+  const atualizarEquipe = async (userId: string, teamId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ team_id: teamId || null })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Equipe atualizada',
+        description: 'A equipe do usuário foi atualizada com sucesso.',
+      });
+
+      setEditingUserId(null);
+      setEditingTeamId('');
+      carregarUsuarios();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao atualizar equipe',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (loading || loadingUsers) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -233,6 +276,7 @@ export default function AdminUsuarios() {
                   <TableRow>
                     <TableHead>Email</TableHead>
                     <TableHead>Papel</TableHead>
+                    <TableHead>Equipe</TableHead>
                     <TableHead>Criado em</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -248,6 +292,45 @@ export default function AdminUsuarios() {
                           <Badge variant="secondary">Usuário</Badge>
                         ) : (
                           <Badge variant="outline">Sem papel</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingUserId === user.id ? (
+                          <div className="flex gap-2">
+                            <Select value={editingTeamId} onValueChange={setEditingTeamId}>
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Sem equipe" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Sem equipe</SelectItem>
+                                {teams.map((team) => (
+                                  <SelectItem key={team.id} value={team.id}>
+                                    {team.nome}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button size="sm" onClick={() => atualizarEquipe(user.id, editingTeamId)}>
+                              Salvar
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => setEditingUserId(null)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span>{user.team_nome || 'Sem equipe'}</span>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingUserId(user.id);
+                                setEditingTeamId(user.team_id || '');
+                              }}
+                            >
+                              Editar
+                            </Button>
+                          </div>
                         )}
                       </TableCell>
                       <TableCell>

@@ -54,8 +54,28 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
       if (signUpError) throw signUpError;
 
       if (data.user) {
+        // Aguardar a criação do profile pelo trigger
+        let attempts = 0;
+        const maxAttempts = 10;
+        let profileExists = false;
+
+        while (attempts < maxAttempts && !profileExists) {
+          const { data: checkProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          if (checkProfile) {
+            profileExists = true;
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            attempts++;
+          }
+        }
+
         // Atualizar profile com team_id
-        if (novaEquipe) {
+        if (novaEquipe && profileExists) {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({ team_id: novaEquipe })
@@ -63,6 +83,11 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
 
           if (profileError) {
             console.error('Erro ao atualizar profile:', profileError);
+            toast({
+              title: 'Aviso',
+              description: 'Usuário criado, mas não foi possível vincular à equipe.',
+              variant: 'destructive',
+            });
           }
         }
 
@@ -74,7 +99,7 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
 
         toast({
           title: 'Usuário criado!',
-          description: `${novoEmail} foi criado como ${novoPapel}.`,
+          description: `${novoEmail} foi criado como ${novoPapel}${novaEquipe ? ' e vinculado à equipe' : ''}.`,
         });
 
         setNovoEmail('');
