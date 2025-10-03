@@ -169,9 +169,9 @@ export default function Simulador() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+    <div className="min-h-screen bg-[#0a1628]">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur">
+      <header className="border-b border-white/10 bg-[#0a1628] backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoPontua} alt="Pontua" className="h-8" />
@@ -180,7 +180,7 @@ export default function Simulador() {
             {role === 'admin' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
                     <Settings className="h-4 w-4 mr-2" />
                     Admin
                   </Button>
@@ -203,8 +203,8 @@ export default function Simulador() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <div className="text-sm text-muted-foreground">{user?.email}</div>
-            <Button variant="ghost" onClick={signOut}>
+            <div className="text-sm text-white/80">{user?.email}</div>
+            <Button variant="ghost" onClick={signOut} className="text-white hover:bg-white/10">
               <LogOut className="h-4 w-4 mr-2" />
               Sair
             </Button>
@@ -214,14 +214,14 @@ export default function Simulador() {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="simulador" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="simulador">Simulador</TabsTrigger>
-            <TabsTrigger value="espaco-vendedor">Espaço do Vendedor</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-8 bg-white/5">
+            <TabsTrigger value="simulador" className="text-white data-[state=active]:bg-white data-[state=active]:text-[#0a1628]">Simulador</TabsTrigger>
+            <TabsTrigger value="espaco-vendedor" className="text-white data-[state=active]:bg-white data-[state=active]:text-[#0a1628]">Espaço do Vendedor</TabsTrigger>
           </TabsList>
 
           <TabsContent value="simulador" className="space-y-8">
             {teamButton && (
-              <div className="flex justify-end">
+              <div className="flex justify-end mb-6">
                 <Button
                   size="lg"
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
@@ -232,6 +232,302 @@ export default function Simulador() {
                 </Button>
               </div>
             )}
+
+            {/* Título da seção */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white mb-3">Escolha seu plano ideal</h1>
+              <p className="text-lg text-white/70">Configure e visualize o investimento personalizado para sua empresa</p>
+            </div>
+
+            {/* Pricing Cards Grid */}
+            <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-12">
+              {/* Plano Empreendedor */}
+              <Card className={`relative transition-all hover:shadow-xl ${plano === 'Plano Empreendedor' ? 'ring-2 ring-primary' : ''}`}>
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold mb-4">Plano Empreendedor</CardTitle>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold">R$ 59,00</span>
+                  </div>
+                  <CardDescription className="text-sm">
+                    Para negócios de até 12 colaboradores que estão iniciando o controle de jornada.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
+                    onClick={() => setPlano('Plano Empreendedor')}
+                  >
+                    {plano === 'Plano Empreendedor' ? 'Selecionado ✓' : 'Selecionar'}
+                  </Button>
+                  
+                  <div className="space-y-2 pt-4">
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Até 03 empresas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Até 03 turnos</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Registro de ponto por geolocalização</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Gestão de ponto simples</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Locais de trabalho ilimitados</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Regras de ponto ilimitadas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Controle de acesso</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Automações simples</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Segurança de IP</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Exportação para folha de pagamento</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">01 integração com relógio de ponto</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Suporte via chat</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Plano Profissional - DESTAQUE */}
+              <Card className={`relative transition-all ${plano === 'Plano profissional' ? 'ring-4 ring-green-500 scale-105 shadow-2xl' : 'ring-2 ring-green-500 shadow-xl'}`}>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-2 rounded-full font-semibold text-sm flex items-center gap-2">
+                  Mais vendido ⭐
+                </div>
+                <CardHeader className="text-center pb-4 pt-8">
+                  <CardTitle className="text-2xl font-bold mb-4">Plano Profissional</CardTitle>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold">R$ 109,00</span>
+                  </div>
+                  <CardDescription className="text-sm">
+                    Indicado para negócios que queiram automatizar processos e rotinas e ser mais ágeis.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
+                    onClick={() => setPlano('Plano profissional')}
+                  >
+                    {plano === 'Plano profissional' ? 'Selecionado ✓' : 'Selecionar'}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 border-2 border-[#0f1e3d]"
+                  >
+                    Tudo do plano empreendedor +
+                  </Button>
+                  
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Até 15 empresas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Turnos ilimitados</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Regras de ponto avançadas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Centro de custo</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Gestão de ponto avançada</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Controle de acesso ilimitado</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Registro de ponto por foto</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Automações avançadas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Rotinas de controle da equipe</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Assinatura eletrônica</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Marketplace</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Integrações ilimitadas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Sobreaviso</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Plano Corporativo */}
+              <Card className={`relative transition-all hover:shadow-xl ${plano === 'Plano corporativo' ? 'ring-2 ring-primary' : ''}`}>
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl font-bold mb-4">Plano Corporativo</CardTitle>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold">R$ 144,00</span>
+                  </div>
+                  <CardDescription className="text-sm">
+                    Indicado para empresas que buscam ainda mais controle, segurança e produtividade no controle de jornada.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
+                    onClick={() => setPlano('Plano corporativo')}
+                  >
+                    {plano === 'Plano corporativo' ? 'Selecionado ✓' : 'Selecionar'}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 border-2 border-[#0f1e3d]"
+                  >
+                    Tudo do plano profissional +
+                  </Button>
+                  
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Empresas ilimitadas</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Registro de ponto por reconhecimento facial individual online</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Registro de ponto por reconhecimento facial coletivo</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Cadastro de reconhecimento facial</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Suporte telefônico</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">API para integração aberta</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Armazenamento ilimitado</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="text-sm">Gerente de contas exclusivo</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             <div className="max-w-5xl mx-auto">
               {/* Título e Descrição */}
