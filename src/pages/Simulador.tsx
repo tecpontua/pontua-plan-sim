@@ -266,23 +266,11 @@ export default function Simulador() {
               <Card className={`relative transition-all hover:shadow-xl ${plano === 'Plano Empreendedor' ? 'ring-2 ring-primary' : ''}`}>
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Empreendedor</CardTitle>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold">
-                      {precoEmpreendedor ? formatMoney(precoEmpreendedor) : 'R$ 59,00'}
-                    </span>
-                  </div>
                   <CardDescription className="text-sm">
                     Para negócios de até 12 colaboradores que estão iniciando o controle de jornada.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button 
-                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
-                    onClick={() => setPlano('Plano Empreendedor')}
-                  >
-                    {plano === 'Plano Empreendedor' ? 'Selecionado ✓' : 'Selecionar'}
-                  </Button>
-                  
                   <div className="space-y-2 pt-4">
                     <div className="flex items-start gap-2">
                       <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -367,23 +355,11 @@ export default function Simulador() {
                 </div>
                 <CardHeader className="text-center pb-4 pt-8">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Profissional</CardTitle>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold">
-                      {precoProfissional ? formatMoney(precoProfissional) : 'R$ 109,00'}
-                    </span>
-                  </div>
                   <CardDescription className="text-sm">
                     Indicado para negócios que queiram automatizar processos e rotinas e ser mais ágeis.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button 
-                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
-                    onClick={() => setPlano('Plano profissional')}
-                  >
-                    {plano === 'Plano profissional' ? 'Selecionado ✓' : 'Selecionar'}
-                  </Button>
-                  
                   <Button 
                     variant="outline" 
                     className="w-full h-12 border-2 border-[#0f1e3d]"
@@ -478,23 +454,11 @@ export default function Simulador() {
               <Card className={`relative transition-all hover:shadow-xl ${plano === 'Plano corporativo' ? 'ring-2 ring-primary' : ''}`}>
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold mb-4">Plano Corporativo</CardTitle>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold">
-                      {precoCorporativo ? formatMoney(precoCorporativo) : 'R$ 144,00'}
-                    </span>
-                  </div>
                   <CardDescription className="text-sm">
                     Indicado para empresas que buscam ainda mais controle, segurança e produtividade no controle de jornada.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button 
-                    className="w-full h-12 bg-[#0f1e3d] hover:bg-[#1a2b4d] text-white font-semibold"
-                    onClick={() => setPlano('Plano corporativo')}
-                  >
-                    {plano === 'Plano corporativo' ? 'Selecionado ✓' : 'Selecionar'}
-                  </Button>
-                  
                   <Button 
                     variant="outline" 
                     className="w-full h-12 border-2 border-[#0f1e3d]"
