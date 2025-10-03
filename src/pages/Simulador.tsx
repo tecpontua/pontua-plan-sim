@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Users, Calculator, UserPlus, Settings, ExternalLink } from 'lucide-react';
+import { LogOut, Users, Calculator, UserPlus, Settings, ExternalLink, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { NovoUsuarioModal } from '@/components/NovoUsuarioModal';
+import { CupomModal } from '@/components/CupomModal';
 import EspacoVendedor from './EspacoVendedor';
 import logoPontua from '@/assets/logo-pontua-branca.svg';
 import {
@@ -49,6 +50,8 @@ export default function Simulador() {
   const [pacotesColaboradores, setPacotesColaboradores] = useState<number>(0);
   const [treinamento, setTreinamento] = useState<TreinamentoType | null>(null);
   const [modalNovoUsuario, setModalNovoUsuario] = useState(false);
+  const [cupomModal, setCupomModal] = useState(false);
+  const [cupomAplicado, setCupomAplicado] = useState<any>(null);
   const [teamButton, setTeamButton] = useState<{ titulo: string; link: string } | null>(null);
 
   useEffect(() => {
@@ -170,6 +173,38 @@ export default function Simulador() {
         valor: pacotesColaboradores * precoUnitario * 5
       };
     }
+
+    // Aplicar cupom de desconto se houver
+    if (cupomAplicado && resultado) {
+      const descontos: any = {};
+      
+      // Desconto no treinamento
+      if (resultado.treinamento && cupomAplicado.desconto_treinamento_tipo !== 'nenhum') {
+        const valorDesconto = cupomAplicado.desconto_treinamento_tipo === 'percentual'
+          ? resultado.treinamento.precoFinal * (cupomAplicado.desconto_treinamento_valor / 100)
+          : cupomAplicado.desconto_treinamento_valor;
+        
+        descontos.treinamento = valorDesconto;
+        resultado.treinamento.precoFinal -= valorDesconto;
+        resultado.treinamento.desconto += cupomAplicado.desconto_treinamento_tipo === 'percentual'
+          ? cupomAplicado.desconto_treinamento_valor
+          : 0;
+      }
+      
+      // Desconto na mensalidade
+      if (cupomAplicado.desconto_mensalidade_tipo !== 'nenhum') {
+        const valorDesconto = cupomAplicado.desconto_mensalidade_tipo === 'percentual'
+          ? resultado.totalMensal * (cupomAplicado.desconto_mensalidade_valor / 100)
+          : cupomAplicado.desconto_mensalidade_valor;
+        
+        descontos.mensalidade = valorDesconto;
+        descontos.mensalidadeMeses = cupomAplicado.desconto_mensalidade_meses;
+        resultado.totalMensal -= valorDesconto;
+      }
+      
+      (resultado as any).cupomDescontos = descontos;
+      (resultado as any).cupomCodigo = cupomAplicado.codigo;
+    }
   } catch (error) {
     // Erro de validação
   }
@@ -256,6 +291,10 @@ export default function Simulador() {
                   <DropdownMenuItem onClick={() => navigate('/admin/equipes')}>
                     <Settings className="h-4 w-4 mr-2" />
                     Gerenciar Equipes
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/cupons')}>
+                    <Tag className="h-4 w-4 mr-2" />
+                    Gerenciar Cupons
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -714,9 +753,6 @@ export default function Simulador() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <h3 className="text-lg font-semibold">Treinamento</h3>
-                      {plano === 'Plano corporativo' && (
-                        <Badge className="bg-green-600">30% OFF</Badge>
-                      )}
                     </div>
                     <Select value={treinamento || 'none'} onValueChange={(v) => setTreinamento(v === 'none' ? null : v as TreinamentoType)}>
                       <SelectTrigger className="h-12">
@@ -744,10 +780,21 @@ export default function Simulador() {
                         <CardTitle className="text-2xl mb-2">Resumo da Simulação</CardTitle>
                         <CardDescription className="text-base">Confira o detalhamento do seu plano personalizado</CardDescription>
                       </div>
-                      <Button variant="outline" onClick={copiarResumo} className="gap-2">
-                        <Calculator className="h-4 w-4" />
-                        Copiar Resumo
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setCupomModal(true)}
+                          className="gap-2"
+                          size="icon"
+                          title="Aplicar cupom de desconto"
+                        >
+                          $
+                        </Button>
+                        <Button variant="outline" onClick={copiarResumo} className="gap-2">
+                          <Calculator className="h-4 w-4" />
+                          Copiar Resumo
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-8 space-y-8">
@@ -823,6 +870,24 @@ export default function Simulador() {
                           <p className="text-sm text-muted-foreground mt-2">por mês</p>
                         </div>
                       </div>
+                      
+                      {/* Condições especiais do cupom */}
+                      {(resultado as any).cupomCodigo && (
+                        <div className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-green-600">Cupom Aplicado</Badge>
+                            <span className="font-mono font-bold">{(resultado as any).cupomCodigo}</span>
+                          </div>
+                          {(resultado as any).cupomDescontos?.mensalidade && (
+                            <p className="text-sm text-green-600">
+                              Desconto de {formatMoney((resultado as any).cupomDescontos.mensalidade)} na mensalidade
+                              {(resultado as any).cupomDescontos.mensalidadeMeses 
+                                ? ` por ${(resultado as any).cupomDescontos.mensalidadeMeses} meses`
+                                : ' permanente'}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Treinamento */}
@@ -834,6 +899,11 @@ export default function Simulador() {
                             <h3 className="text-xl font-bold">Treinamento</h3>
                             {resultado.treinamento.desconto > 0 && (
                               <Badge className="bg-green-600 text-lg px-3 py-1">{resultado.treinamento.desconto}% OFF</Badge>
+                            )}
+                            {(resultado as any).cupomDescontos?.treinamento && (
+                              <Badge className="bg-green-600 text-lg px-3 py-1">
+                                Cupom: -{formatMoney((resultado as any).cupomDescontos.treinamento)}
+                              </Badge>
                             )}
                           </div>
                           
@@ -890,6 +960,15 @@ export default function Simulador() {
             title: 'Sucesso!',
             description: 'Usuário criado com sucesso.',
           });
+        }}
+      />
+      
+      {/* Modal de Cupom */}
+      <CupomModal
+        open={cupomModal}
+        onOpenChange={setCupomModal}
+        onCupomAplicado={(cupom) => {
+          setCupomAplicado(cupom);
         }}
       />
     </div>

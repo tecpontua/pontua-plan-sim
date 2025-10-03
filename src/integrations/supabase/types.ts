@@ -73,6 +73,51 @@ export type Database = {
           },
         ]
       }
+      codigos_promocionais: {
+        Row: {
+          ativo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          desconto_mensalidade_meses: number | null
+          desconto_mensalidade_tipo: string | null
+          desconto_mensalidade_valor: number | null
+          desconto_treinamento_tipo: string | null
+          desconto_treinamento_valor: number | null
+          descricao: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          desconto_mensalidade_meses?: number | null
+          desconto_mensalidade_tipo?: string | null
+          desconto_mensalidade_valor?: number | null
+          desconto_treinamento_tipo?: string | null
+          desconto_treinamento_valor?: number | null
+          descricao?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          desconto_mensalidade_meses?: number | null
+          desconto_mensalidade_tipo?: string | null
+          desconto_mensalidade_valor?: number | null
+          desconto_treinamento_tipo?: string | null
+          desconto_treinamento_valor?: number | null
+          descricao?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       links_uteis: {
         Row: {
           categoria: string

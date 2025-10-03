@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Simulador from "./pages/Simulador";
 import AdminUsuarios from "./pages/AdminUsuarios";
 import AdminEquipes from "./pages/AdminEquipes";
+import AdminCupons from "./pages/AdminCupons";
 import Setup from "./pages/Setup";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminEquipes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/cupons"
+              element={
+                <ProtectedRoute>
+                  <AdminCupons />
                 </ProtectedRoute>
               }
             />

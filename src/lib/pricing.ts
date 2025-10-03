@@ -149,12 +149,12 @@ export function calcularSimulacao(input: SimulacaoInput): SimulacaoResult {
 
   const totalMensal = precoBase + empresasAdicionais + apiAberta + reconhecimentoFacial;
 
-  // Treinamento
+  // Treinamento (removido desconto padrão para corporativo)
   let treinamento: SimulacaoResult["treinamento"] = null;
 
   if (input.treinamento) {
     const precoOriginal = TREINAMENTOS[input.treinamento].preco;
-    const desconto = input.plano === "Plano corporativo" ? 0.3 : 0;
+    const desconto = 0; // Sem desconto padrão
     const precoFinal = precoOriginal * (1 - desconto);
 
     const parcelamento = [
