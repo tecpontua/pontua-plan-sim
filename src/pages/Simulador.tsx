@@ -28,6 +28,7 @@ import {
   PlanType,
   TreinamentoType,
   TREINAMENTOS,
+  PRICING_TABLE,
   getAvailableTiers,
   calcularSimulacao,
 } from '@/lib/pricing';
@@ -45,6 +46,7 @@ export default function Simulador() {
   const [empresasAdicionaisPacotes, setEmpresasAdicionaisPacotes] = useState<number>(0);
   const [apiAberta, setApiAberta] = useState<boolean>(false);
   const [reconhecimentoFacialQtd, setReconhecimentoFacialQtd] = useState<number>(0);
+  const [pacotesColaboradores, setPacotesColaboradores] = useState<number>(0);
   const [treinamento, setTreinamento] = useState<TreinamentoType | null>(null);
   const [modalNovoUsuario, setModalNovoUsuario] = useState(false);
   const [teamButton, setTeamButton] = useState<{ titulo: string; link: string } | null>(null);
@@ -123,17 +125,51 @@ export default function Simulador() {
     ? validarPersonalizado(colaboradoresPersonalizado) 
     : null;
 
+  // Calcular preço unitário por colaborador da faixa atual
+  const calcularPrecoUnitario = () => {
+    if (plano === 'Plano Empreendedor') return 0;
+    
+    const planData = PRICING_TABLE[plano];
+    const tiers = getAvailableTiers(plano);
+    
+    // Encontrar a faixa do colaborador atual
+    let faixaAtual = tiers[0];
+    for (const tier of tiers) {
+      if (colaboradores >= tier) {
+        faixaAtual = tier;
+      } else {
+        break;
+      }
+    }
+    
+    const precoFaixa = (planData as any)[faixaAtual];
+    return Math.round((precoFaixa / faixaAtual) * 100) / 100;
+  };
+
+  const precoUnitario = calcularPrecoUnitario();
+
   // Calcular simulação
   let resultado = null;
   try {
+    // Adicionar colaboradores dos pacotes extras ao total
+    const colaboradoresTotais = colaboradores + (pacotesColaboradores * 5);
+    
     resultado = calcularSimulacao({
       plano,
-      colaboradores,
+      colaboradores: colaboradoresTotais,
       empresasAdicionaisPacotes,
       apiAberta,
       reconhecimentoFacialQtd,
       treinamento,
     });
+    
+    // Adicionar informação sobre pacotes de colaboradores adicionais para exibição
+    if (pacotesColaboradores > 0) {
+      (resultado as any).pacotesColaboradores = {
+        quantidade: pacotesColaboradores,
+        valor: pacotesColaboradores * precoUnitario * 5
+      };
+    }
   } catch (error) {
     // Erro de validação
   }
@@ -600,12 +636,36 @@ export default function Simulador() {
 
                   <Separator />
 
-                  {/* Adicionais */}
+                   {/* Adicionais */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Recursos Adicionais</h3>
                     
+                    {plano === 'Plano Empreendedor' && (
+                      <div className="p-4 bg-muted/50 rounded-xl">
+                        <p className="text-sm text-muted-foreground text-center">
+                          Não é possível adicionar recursos nesse plano.
+                        </p>
+                      </div>
+                    )}
+                    
                     {plano !== 'Plano Empreendedor' && (
                       <div className="space-y-4 p-4 bg-muted/50 rounded-xl">
+                        <div className="space-y-3">
+                          <Label className="text-base font-semibold">Pacotes de 5 colaboradores adicionais</Label>
+                          <div className="flex items-center gap-4">
+                            <Input
+                              type="number"
+                              min={0}
+                              value={pacotesColaboradores}
+                              onChange={(e) => setPacotesColaboradores(Number(e.target.value))}
+                              className="h-12"
+                            />
+                            <Badge variant="secondary" className="whitespace-nowrap">
+                              {formatMoney(precoUnitario * 5)}/pacote
+                            </Badge>
+                          </div>
+                        </div>
+
                         <div className="space-y-3">
                           <Label className="text-base font-semibold">Pacotes de 3 empresas adicionais</Label>
                           <div className="flex items-center gap-4">
@@ -712,6 +772,17 @@ export default function Simulador() {
                               <td className="p-4 text-muted-foreground">{colaboradores} colaboradores</td>
                               <td className="p-4 text-right font-semibold">{formatMoney(resultado.precoBase)}</td>
                             </tr>
+                            {(resultado as any).pacotesColaboradores && (
+                              <tr className="hover:bg-muted/30 transition-colors">
+                                <td className="p-4 font-medium">Pacotes de colaboradores adicionais</td>
+                                <td className="p-4 text-muted-foreground">
+                                  {(resultado as any).pacotesColaboradores.quantidade} pacotes (5 colaboradores cada)
+                                </td>
+                                <td className="p-4 text-right font-semibold">
+                                  {formatMoney((resultado as any).pacotesColaboradores.valor)}
+                                </td>
+                              </tr>
+                            )}
                             {resultado.empresasAdicionais > 0 && (
                               <tr className="hover:bg-muted/30 transition-colors">
                                 <td className="p-4 font-medium">Empresas adicionais</td>
