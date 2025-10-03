@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { NovoUsuarioModal } from '@/components/NovoUsuarioModal';
 import EspacoVendedor from './EspacoVendedor';
-import logoPontua from '@/assets/logo-pontua.svg';
+import logoPontua from '@/assets/logo-pontua-branca.svg';
 import {
   PlanType,
   TreinamentoType,
