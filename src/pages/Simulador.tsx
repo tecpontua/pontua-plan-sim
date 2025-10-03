@@ -781,15 +781,32 @@ export default function Simulador() {
                         <CardDescription className="text-base">Confira o detalhamento do seu plano personalizado</CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setCupomModal(true)}
-                          className="gap-2"
-                          size="icon"
-                          title="Aplicar cupom de desconto"
-                        >
-                          $
-                        </Button>
+                        {cupomAplicado ? (
+                          <Button 
+                            variant="destructive" 
+                            onClick={() => {
+                              setCupomAplicado(null);
+                              toast({
+                                title: 'Cupom removido',
+                                description: 'O cupom foi removido da simulação',
+                              });
+                            }}
+                            className="gap-2"
+                            title="Remover cupom aplicado"
+                          >
+                            Remover Cupom
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setCupomModal(true)}
+                            className="gap-2"
+                            size="icon"
+                            title="Aplicar cupom de desconto"
+                          >
+                            $
+                          </Button>
+                        )}
                         <Button variant="outline" onClick={copiarResumo} className="gap-2">
                           <Calculator className="h-4 w-4" />
                           Copiar Resumo
