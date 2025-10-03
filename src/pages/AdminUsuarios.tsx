@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
@@ -146,13 +145,26 @@ export default function AdminUsuarios() {
     if (!confirm('Tem certeza que deseja deletar este usuário?')) return;
 
     try {
-      // Deletar papel primeiro
-      await supabase.from('user_roles').delete().eq('user_id', userId);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('Não autenticado');
+      }
 
-      // Deletar perfil (cascade deleta o usuário auth)
-      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao deletar usuário');
+      }
 
       toast({
         title: 'Usuário deletado',
@@ -246,15 +258,15 @@ export default function AdminUsuarios() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="papel">Papel</Label>
-                  <Select value={novoPapel} onValueChange={(v) => setNovoPapel(v as 'admin' | 'usuario')}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="usuario">Usuário Padrão</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    id="papel"
+                    value={novoPapel}
+                    onChange={(e) => setNovoPapel(e.target.value as 'admin' | 'usuario')}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="usuario">Usuário Padrão</option>
+                    <option value="admin">Administrador</option>
+                  </select>
                 </div>
                 <Button type="submit" className="w-full" disabled={criando}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -296,24 +308,30 @@ export default function AdminUsuarios() {
                       </TableCell>
                       <TableCell>
                         {editingUserId === user.id ? (
-                          <div className="flex gap-2">
-                            <Select value={editingTeamId} onValueChange={setEditingTeamId}>
-                              <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Sem equipe" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="">Sem equipe</SelectItem>
-                                {teams.map((team) => (
-                                  <SelectItem key={team.id} value={team.id}>
-                                    {team.nome}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                          <div className="flex gap-2 items-center">
+                            <select
+                              value={editingTeamId}
+                              onChange={(e) => setEditingTeamId(e.target.value)}
+                              className="flex h-9 w-[180px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
+                              <option value="">Sem equipe</option>
+                              {teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                  {team.nome}
+                                </option>
+                              ))}
+                            </select>
                             <Button size="sm" onClick={() => atualizarEquipe(user.id, editingTeamId)}>
                               Salvar
                             </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setEditingUserId(null)}>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              onClick={() => {
+                                setEditingUserId(null);
+                                setEditingTeamId('');
+                              }}
+                            >
                               Cancelar
                             </Button>
                           </div>
