@@ -2,6 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Identidade Pontua - Azuis Corporativos */
+    --primary: 210 100% 45%; /* Azul Pontua primário */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 210 40% 96%; /* Azul clarinho */
+    --secondary-foreground: 210 100% 25%;
+    
+    --accent: 200 95% 50%; /* Azul vibrante */
+    --accent-foreground: 0 0% 100%;
+    
+    --background: 0 0% 100%;
+    --foreground: 210 15% 20%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 210 15% 20%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 15% 20%;
+    
+    --muted: 210 40% 96%;
+    --muted-foreground: 210 15% 45%;
+    
+    --border: 210 30% 90%;
+    --input: 210 30% 90%;
+    --ring: 210 100% 45%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --primary: 210 100% 55%;
+    --primary-foreground: 210 15% 10%;
+    
+    --secondary: 210 25% 15%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 200 95% 50%;
+    --accent-foreground: 0 0% 100%;
+    
+    --background: 210 20% 8%;
+    --foreground: 0 0% 95%;
+    
+    --card: 210 20% 10%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 210 20% 10%;
+    --popover-foreground: 0 0% 95%;
+    
+    --muted: 210 25% 15%;
+    --muted-foreground: 210 15% 65%;
+    
+    --border: 210 25% 20%;
+    --input: 210 25% 20%;
+    --ring: 210 100% 55%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
