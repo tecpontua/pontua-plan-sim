@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Login from "./pages/Login";
 import Simulador from "./pages/Simulador";
 import AdminUsuarios from "./pages/AdminUsuarios";
+import Setup from "./pages/Setup";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/setup" element={<Setup />} />
             <Route path="/login" element={<Login />} />
             <Route
               path="/"
