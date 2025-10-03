@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, Users, Calculator, UserPlus, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { NovoUsuarioModal } from '@/components/NovoUsuarioModal';
+import EspacoVendedor from './EspacoVendedor';
+import logoPontua from '@/assets/logo-pontua.svg';
 import {
   PlanType,
   TreinamentoType,
@@ -125,8 +128,7 @@ export default function Simulador() {
       <header className="border-b bg-card/50 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calculator className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-primary">Pontua Simulador</h1>
+            <img src={logoPontua} alt="Pontua" className="h-8" />
           </div>
           <div className="flex items-center gap-4">
             {role === 'admin' && (
@@ -161,6 +163,15 @@ export default function Simulador() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-primary mb-6">Planos Pontua</h1>
+
+        <Tabs defaultValue="simulador" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="simulador">Simulador</TabsTrigger>
+            <TabsTrigger value="espaco-vendedor">Espaço do Vendedor</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="simulador" className="space-y-6">
         <div className="grid md:grid-cols-3 gap-6">
           {/* Seleção Principal */}
           <Card>
@@ -391,6 +402,12 @@ export default function Simulador() {
             </CardContent>
           </Card>
         )}
+          </TabsContent>
+
+          <TabsContent value="espaco-vendedor">
+            <EspacoVendedor />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Modal de Novo Usuário */}

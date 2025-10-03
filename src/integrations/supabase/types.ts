@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      avisos: {
+        Row: {
+          conteudo: string
+          created_at: string
+          created_by: string | null
+          id: string
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      avisos_visualizacoes: {
+        Row: {
+          aviso_id: string
+          id: string
+          user_id: string
+          visualizado_at: string
+        }
+        Insert: {
+          aviso_id: string
+          id?: string
+          user_id: string
+          visualizado_at?: string
+        }
+        Update: {
+          aviso_id?: string
+          id?: string
+          user_id?: string
+          visualizado_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_visualizacoes_aviso_id_fkey"
+            columns: ["aviso_id"]
+            isOneToOne: false
+            referencedRelation: "avisos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      links_uteis: {
+        Row: {
+          categoria: string
+          created_at: string
+          id: string
+          ordem: number | null
+          titulo: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          titulo: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          titulo?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      materiais_apoio: {
+        Row: {
+          cliente_alvo: string | null
+          created_at: string
+          id: string
+          tipo: string
+          titulo: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          cliente_alvo?: string | null
+          created_at?: string
+          id?: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          cliente_alvo?: string | null
+          created_at?: string
+          id?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -29,6 +148,39 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+        }
+        Relationships: []
+      }
+      treinamentos: {
+        Row: {
+          created_at: string
+          id: string
+          ordem: number | null
+          tipo: string
+          titulo: string
+          trilha: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          tipo: string
+          titulo: string
+          trilha: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          tipo?: string
+          titulo?: string
+          trilha?: string
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import logoPontua from '@/assets/logo-pontua.svg';
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: 'Email inválido' }),
@@ -69,7 +70,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">Pontua Simulador</CardTitle>
+          <div className="flex justify-center mb-4">
+            <img src={logoPontua} alt="Pontua" className="h-12" />
+          </div>
           <CardDescription>Simule planos em call com clientes</CardDescription>
         </CardHeader>
         <CardContent>
