@@ -25,48 +25,93 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+    
     // Setup auth listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch role after state is set
         if (session?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id);
+            if (mounted) {
+              fetchUserRole(session.user.id);
+            }
           }, 0);
         } else {
           setRole(null);
+          setLoading(false);
         }
       }
     );
 
-    // Check existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      } else {
+    // Check existing session with timeout
+    const sessionTimeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn('Session check timeout, setting loading to false');
         setLoading(false);
       }
-    });
+    }, 5000);
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (!mounted) return;
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setLoading(false);
+          return;
+        }
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          fetchUserRole(session.user.id);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.error('Session check failed:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+      clearTimeout(sessionTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserRole = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Add timeout for role fetch
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Role fetch timeout')), 3000)
+      );
+      
+      const rolePromise = supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (error) throw error;
-      setRole(data?.role || null);
+      const { data, error } = await Promise.race([rolePromise, timeoutPromise]) as any;
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        setRole(null);
+      } else {
+        setRole(data?.role || null);
+      }
     } catch (error) {
       console.error('Erro ao buscar papel do usuário:', error);
       setRole(null);
@@ -84,16 +129,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    });
-    return { error };
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
+      return { error };
+    } catch (error) {
+      console.error('SignUp error:', error);
+      return { error };
+    }
   };
 
   const signOut = async () => {

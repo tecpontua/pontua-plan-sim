@@ -55,46 +55,55 @@ export default function Simulador() {
   const [teamButton, setTeamButton] = useState<{ titulo: string; link: string } | null>(null);
 
   useEffect(() => {
-    fetchTeamButton();
+    if (user) {
+      fetchTeamButton();
+    }
   }, [user]);
 
   const fetchTeamButton = async () => {
     if (!user) return;
 
     try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('team_id')
-        .eq('id', user.id)
-        .maybeSingle();
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Fetch timeout')), 5000)
+      );
 
-      if (profileError) {
-        console.error('Erro ao buscar profile:', profileError);
-        return;
-      }
-
-      if (profile?.team_id) {
-        const { data: button, error: buttonError } = await supabase
-          .from('team_buttons')
-          .select('titulo, link')
-          .eq('team_id', profile.team_id)
+      const fetchPromise = (async () => {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('team_id')
+          .eq('id', user.id)
           .maybeSingle();
 
-        if (buttonError) {
-          console.error('Erro ao buscar botão:', buttonError);
-          return;
+        if (profileError) {
+          console.error('Erro ao buscar profile:', profileError);
+          return null;
         }
 
-        if (button) {
-          setTeamButton(button);
-        } else {
-          setTeamButton(null);
+        if (profile?.team_id) {
+          const { data: button, error: buttonError } = await supabase
+            .from('team_buttons')
+            .select('titulo, link')
+            .eq('team_id', profile.team_id)
+            .maybeSingle();
+
+          if (buttonError) {
+            console.error('Erro ao buscar botão:', buttonError);
+            return null;
+          }
+
+          return button;
         }
-      } else {
-        setTeamButton(null);
-      }
+        
+        return null;
+      })();
+
+      const button = await Promise.race([fetchPromise, timeoutPromise]);
+      setTeamButton(button as any);
     } catch (error) {
       console.error('Erro ao buscar botão da equipe:', error);
+      setTeamButton(null);
     }
   };
 
