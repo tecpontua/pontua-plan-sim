@@ -147,9 +147,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setRole(null);
-    navigate('/login');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Erro ao fazer logout:', error);
+        throw error;
+      }
+      setRole(null);
+      setUser(null);
+      setSession(null);
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro no signOut:', error);
+      // Força logout local mesmo se houver erro no servidor
+      setRole(null);
+      setUser(null);
+      setSession(null);
+      navigate('/login');
+    }
   };
 
   return (

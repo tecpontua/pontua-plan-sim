@@ -101,35 +101,41 @@ export default function AdminUsuarios() {
     setCriando(true);
 
     try {
-      // Criar usuário via função administrativa (simulado com signup)
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: novoEmail,
-        password: novaSenha,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('Não autenticado');
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          email: novoEmail,
+          password: novaSenha,
+          role: novoPapel,
+          teamId: null,
+        }),
       });
 
-      if (signUpError) throw signUpError;
+      const result = await response.json();
 
-      if (data.user) {
-        // Atribuir papel
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: data.user.id, role: novoPapel });
-
-        if (roleError) throw roleError;
-
-        toast({
-          title: 'Usuário criado!',
-          description: `${novoEmail} foi criado como ${novoPapel}.`,
-        });
-
-        setNovoEmail('');
-        setNovaSenha('');
-        setNovoPapel('usuario');
-        carregarUsuarios();
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao criar usuário');
       }
+
+      toast({
+        title: 'Usuário criado!',
+        description: `${novoEmail} foi criado como ${novoPapel}.`,
+      });
+
+      setNovoEmail('');
+      setNovaSenha('');
+      setNovoPapel('usuario');
+      carregarUsuarios();
     } catch (error: any) {
       toast({
         title: 'Erro ao criar usuário',

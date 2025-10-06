@@ -43,72 +43,43 @@ export function NovoUsuarioModal({ open, onOpenChange, onSuccess }: NovoUsuarioM
     setCriando(true);
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: novoEmail,
-        password: novaSenha,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('Não autenticado');
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          email: novoEmail,
+          password: novaSenha,
+          role: novoPapel,
+          teamId: novaEquipe || null,
+        }),
       });
 
-      if (signUpError) throw signUpError;
+      const result = await response.json();
 
-      if (data.user) {
-        // Aguardar a criação do profile pelo trigger
-        let attempts = 0;
-        const maxAttempts = 10;
-        let profileExists = false;
-
-        while (attempts < maxAttempts && !profileExists) {
-          const { data: checkProfile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', data.user.id)
-            .maybeSingle();
-
-          if (checkProfile) {
-            profileExists = true;
-          } else {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            attempts++;
-          }
-        }
-
-        // Atualizar profile com team_id
-        if (novaEquipe && profileExists) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ team_id: novaEquipe })
-            .eq('id', data.user.id);
-
-          if (profileError) {
-            console.error('Erro ao atualizar profile:', profileError);
-            toast({
-              title: 'Aviso',
-              description: 'Usuário criado, mas não foi possível vincular à equipe.',
-              variant: 'destructive',
-            });
-          }
-        }
-
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: data.user.id, role: novoPapel });
-
-        if (roleError) throw roleError;
-
-        toast({
-          title: 'Usuário criado!',
-          description: `${novoEmail} foi criado como ${novoPapel}${novaEquipe ? ' e vinculado à equipe' : ''}.`,
-        });
-
-        setNovoEmail('');
-        setNovaSenha('');
-        setNovoPapel('usuario');
-        setNovaEquipe('');
-        onOpenChange(false);
-        onSuccess?.();
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao criar usuário');
       }
+
+      toast({
+        title: 'Usuário criado!',
+        description: `${novoEmail} foi criado como ${novoPapel}${novaEquipe ? ' e vinculado à equipe' : ''}.`,
+      });
+
+      setNovoEmail('');
+      setNovaSenha('');
+      setNovoPapel('usuario');
+      setNovaEquipe('');
+      onOpenChange(false);
+      onSuccess?.();
     } catch (error: any) {
       toast({
         title: 'Erro ao criar usuário',
