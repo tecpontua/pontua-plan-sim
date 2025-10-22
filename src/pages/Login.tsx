@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import logoPontua from '@/assets/logo-pontua-azul.svg';
+import { ForgotPasswordModal } from '@/components/ForgotPasswordModal';
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: 'Email inválido' }),
@@ -108,6 +109,9 @@ export default function Login() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Entrando...' : 'Entrar'}
                 </Button>
+                <div className="text-center mt-2">
+                  <ForgotPasswordModal />
+                </div>
               </form>
             </TabsContent>
             
